@@ -8,176 +8,58 @@
   <meta property="og:site_name" content="Flik" />
   <meta id="og-title" property="og:title" content="Watch this Flik" />
   <meta id="og-description" property="og:description" content="Async video message via Flik" />
-
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg: #080808;
-      --surface: #111;
-      --border: #1e1e1e;
-      --accent: #e8ff47;
-      --text: #f0f0f0;
-      --muted: #888;
+      --bg: #080808; --surface: #111; --border: #1e1e1e;
+      --accent: #e8ff47; --text: #f0f0f0; --muted: #888;
     }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
-      min-height: 100vh;
-    }
-    nav {
-      padding: 20px 32px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border);
-    }
-    .logo {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 20px;
-      color: var(--text);
-      text-decoration: none;
-    }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; }
+    nav { padding: 20px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+    .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 20px; color: var(--text); text-decoration: none; }
     .logo span { color: var(--accent); }
-    .record-btn {
-      background: var(--accent);
-      color: #000;
-      border: none;
-      padding: 10px 20px;
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      font-size: 13px;
-      cursor: pointer;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .container {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 48px 24px;
-    }
+    .record-btn { background: var(--accent); color: #000; border: none; padding: 10px 20px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .container { max-width: 860px; margin: 0 auto; padding: 48px 24px; }
+
+    /* Loading */
     #loading-state { text-align: center; padding: 80px 0; }
-    .spinner {
-      width: 40px; height: 40px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 24px;
-    }
+    .spinner { width: 40px; height: 40px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 24px; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .loading-text { color: var(--muted); font-size: 14px; }
 
+    /* Error */
     #error-state { display: none; text-align: center; padding: 80px 0; }
     .error-code { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 80px; color: var(--border); letter-spacing: -4px; }
     .error-msg { color: var(--muted); margin-top: 16px; }
 
+    /* Video */
     #video-state { display: none; }
-
-    .video-title {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: clamp(22px, 4vw, 34px);
-      letter-spacing: -1px;
-      margin-bottom: 10px;
-    }
-    .video-meta {
-      display: flex;
-      gap: 20px;
-      color: var(--muted);
-      font-size: 13px;
-      flex-wrap: wrap;
-      align-items: center;
-      margin-bottom: 24px;
-    }
+    .video-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(22px, 4vw, 34px); letter-spacing: -1px; margin-bottom: 10px; }
+    .video-meta { display: flex; gap: 20px; color: var(--muted); font-size: 13px; flex-wrap: wrap; align-items: center; margin-bottom: 24px; }
     .status-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; display: inline-block; }
 
-    .video-wrapper {
-      position: relative;
-      padding-top: 56.25%;
-      background: #000;
-      margin-bottom: 24px;
-    }
-    .video-wrapper iframe {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-    .processing-overlay {
-      position: absolute;
-      inset: 0;
-      background: #000;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-    }
+    .video-wrapper { position: relative; padding-top: 56.25%; background: #000; margin-bottom: 24px; }
+    .video-wrapper iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+    .processing-overlay { position: absolute; inset: 0; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
     .processing-overlay p { color: var(--muted); font-size: 14px; }
 
-    .actions {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 32px;
-      flex-wrap: wrap;
-    }
-    .action-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 18px;
-      font-size: 13px;
-      cursor: pointer;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--muted);
-      transition: all 0.2s;
-      text-decoration: none;
-      font-family: 'DM Sans', sans-serif;
-    }
+    .actions { display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+    .action-btn { display: flex; align-items: center; gap: 8px; padding: 10px 18px; font-size: 13px; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--muted); transition: all 0.2s; text-decoration: none; font-family: 'DM Sans', sans-serif; }
     .action-btn:hover { color: var(--text); border-color: var(--muted); }
-    .action-btn.primary {
-      background: var(--accent);
-      color: #000;
-      border-color: var(--accent);
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-    }
+    .action-btn.primary { background: var(--accent); color: #000; border-color: var(--accent); font-family: 'Syne', sans-serif; font-weight: 700; }
     .action-btn.primary:hover { box-shadow: 0 6px 20px rgba(232,255,71,0.25); }
     .action-btn.copied { background: #1a2a00; color: var(--accent); border-color: var(--accent); }
 
+    /* Transcript */
     .transcript-section { border: 1px solid var(--border); background: var(--surface); }
-    .transcript-header {
-      padding: 16px 24px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .transcript-label {
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      font-size: 12px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--accent);
-    }
-    .transcript-body {
-      padding: 24px;
-      font-size: 14px;
-      line-height: 1.8;
-      color: #aaa;
-      max-height: 280px;
-      overflow-y: auto;
-    }
-    .no-transcript { color: var(--muted); font-size: 13px; font-style: italic; }
+    .transcript-header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .transcript-label { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+    .transcript-body { padding: 24px; font-size: 14px; line-height: 1.8; color: #aaa; max-height: 320px; overflow-y: auto; }
+    .transcript-body::-webkit-scrollbar { width: 4px; }
+    .transcript-body::-webkit-scrollbar-thumb { background: var(--border); }
+    .transcript-pending { color: var(--muted); font-size: 13px; font-style: italic; display: flex; align-items: center; gap: 10px; }
+    .transcript-pending .mini-spinner { width: 14px; height: 14px; border: 1.5px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
 
     @media (max-width: 600px) {
       nav { padding: 16px; }
@@ -186,14 +68,10 @@
   </style>
 </head>
 <body>
-
 <nav>
   <a href="/" class="logo">fl<span>i</span>k</a>
   <a href="/" class="record-btn">
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-      <circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.2"/>
-      <circle cx="6" cy="6" r="3" fill="currentColor"/>
-    </svg>
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="6" r="3" fill="currentColor"/></svg>
     Record a Flik
   </a>
 </nav>
@@ -222,27 +100,32 @@
 
     <div class="actions">
       <button class="action-btn primary" id="copy-btn">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-          <rect x="9" y="9" width="13" height="13" rx="1" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="1.5"/>
-        </svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="1.5"/></svg>
         Copy link
       </button>
       <a class="action-btn" id="whatsapp-btn" target="_blank">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-          <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Share on WhatsApp
       </a>
+      <button class="action-btn" id="copy-embed-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Copy embed
+      </button>
     </div>
 
     <div class="transcript-section">
       <div class="transcript-header">
-        <div class="transcript-label">⚡ AI Transcript</div>
+        <div class="transcript-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          AI Transcript
+        </div>
         <button class="action-btn" style="padding:6px 12px;font-size:12px;" id="copy-transcript-btn">Copy</button>
       </div>
       <div class="transcript-body" id="transcript-body">
-        <span class="no-transcript">Transcript is being generated...</span>
+        <div class="transcript-pending">
+          <div class="mini-spinner"></div>
+          Transcript is being generated...
+        </div>
       </div>
     </div>
   </div>
@@ -252,7 +135,8 @@
   const slug = window.location.pathname.split('/f/')[1]?.split('/')[0];
   const API_BASE = window.location.origin;
   let videoData = null;
-  let pollTimer = null;
+  let videoPollTimer = null;
+  let transcriptPollTimer = null;
 
   async function loadVideo() {
     try {
@@ -282,42 +166,60 @@
     const waText = encodeURIComponent(`Watch this Flik: ${title}\n${shareUrl}`);
     document.getElementById('whatsapp-btn').href = `https://wa.me/?text=${waText}`;
 
+    // Video embed
     const wrapper = document.getElementById('video-wrapper');
     if (data.status === 'PROCESSING' || !data.embedUrl) {
-      wrapper.innerHTML = `
-        <div class="processing-overlay">
-          <div class="spinner"></div>
-          <p>Video is processing, hang tight...</p>
-        </div>`;
-      pollStatus();
+      wrapper.innerHTML = `<div class="processing-overlay"><div class="spinner"></div><p>Video is processing...</p></div>`;
+      pollVideoStatus();
     } else {
-      // Bunny Stream embed
-      wrapper.innerHTML = `<iframe
-        src="${data.embedUrl}?autoplay=false&preload=true"
-        loading="lazy"
-        allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture"
-        allowfullscreen
-      ></iframe>`;
+      wrapper.innerHTML = `<iframe src="${data.embedUrl}?autoplay=false&preload=true" allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture" allowfullscreen></iframe>`;
     }
 
+    // Transcript
     if (data.transcript) {
-      document.getElementById('transcript-body').textContent = data.transcript;
+      showTranscript(data.transcript);
+    } else {
+      // Poll for transcript
+      pollTranscript();
     }
   }
 
-  function pollStatus() {
+  function showTranscript(text) {
+    document.getElementById('transcript-body').textContent = text;
+  }
+
+  function pollVideoStatus() {
     let attempts = 0;
-    pollTimer = setInterval(async () => {
-      attempts++;
-      if (attempts > 40) { clearInterval(pollTimer); return; }
+    videoPollTimer = setInterval(async () => {
+      if (++attempts > 40) { clearInterval(videoPollTimer); return; }
       try {
         const res = await fetch(`${API_BASE}/api/video/${slug}/status`);
         const { ready } = await res.json();
-        if (ready) { clearInterval(pollTimer); loadVideo(); }
+        if (ready) { clearInterval(videoPollTimer); loadVideo(); }
       } catch (e) {}
     }, 3000);
   }
 
+  function pollTranscript() {
+    let attempts = 0;
+    transcriptPollTimer = setInterval(async () => {
+      if (++attempts > 40) {
+        clearInterval(transcriptPollTimer);
+        document.getElementById('transcript-body').innerHTML = '<span style="color:var(--muted);font-size:13px;font-style:italic;">Transcript not available.</span>';
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE}/api/video/${slug}`);
+        const data = await res.json();
+        if (data.transcript) {
+          clearInterval(transcriptPollTimer);
+          showTranscript(data.transcript);
+        }
+      } catch (e) {}
+    }, 5000);
+  }
+
+  // Copy link
   document.getElementById('copy-btn').addEventListener('click', () => {
     const url = `${window.location.origin}/f/${slug}`;
     navigator.clipboard.writeText(url).then(() => {
@@ -331,8 +233,22 @@
     });
   });
 
+  // Copy embed
+  document.getElementById('copy-embed-btn').addEventListener('click', () => {
+    if (!videoData?.embedUrl) return;
+    const embed = `<iframe src="${videoData.embedUrl}" style="border:none;width:100%;aspect-ratio:16/9;" allowfullscreen></iframe>`;
+    navigator.clipboard.writeText(embed).then(() => {
+      const btn = document.getElementById('copy-embed-btn');
+      const orig = btn.innerHTML;
+      btn.textContent = '✓ Copied!';
+      setTimeout(() => { btn.innerHTML = orig; }, 2000);
+    });
+  });
+
+  // Copy transcript
   document.getElementById('copy-transcript-btn').addEventListener('click', () => {
-    navigator.clipboard.writeText(document.getElementById('transcript-body').textContent);
+    const text = document.getElementById('transcript-body').textContent;
+    navigator.clipboard.writeText(text);
   });
 
   function formatDate(dateStr) {
